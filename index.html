@@ -437,11 +437,6 @@
 
         // Função para exibir a pista atual
         function displayClue() {
-            // Garante que o mapa esteja inicializado antes de exibir pistas que dependem dele
-            if (!isMapInitialized) {
-                return;
-            }
-
             const clue = TREASURE_HUNT_CLUES[currentClueIndex];
             if (clue) {
                 clueTitle.textContent = `Pista ${currentClueIndex + 1}`;
@@ -450,8 +445,12 @@
                 clueDisplay.classList.remove('hidden');
                 foundClueButton.classList.add('button-disabled'); // Desabilita o botão ao exibir nova pista
                 foundClueButton.disabled = true;
-                updateClueMarkerAndCircle(); // Atualiza o marcador da pista e o círculo no mapa
-                updateArrowDirectionAndColor(); // Atualiza a seta direcional para a nova pista
+
+                // Atualiza o mapa e a seta SOMENTE se o mapa já estiver inicializado
+                if (isMapInitialized) {
+                    updateClueMarkerAndCircle(); // Atualiza o marcador da pista e o círculo no mapa
+                    updateArrowDirectionAndColor(); // Atualiza a seta direcional para a nova pista
+                }
             } else {
                 // Todas as pistas encontradas, exibe a mensagem final
                 clueDisplay.classList.add('hidden');
@@ -490,13 +489,19 @@
             if (!map) {
                 initMap(latitude, longitude);
                 // Após a inicialização do mapa pela primeira vez, exibe a primeira pista
-                displayClue();
+                // displayClue() já é chamada no startButton click, então não precisamos chamar aqui novamente
             } else {
                 updateUserMarker(latitude, longitude);
             }
 
-            // Garante que a seta seja atualizada com a nova posição do usuário
-            updateArrowDirectionAndColor();
+            // Garante que a seta e o círculo sejam atualizados com a nova posição do usuário
+            // Isso é importante porque updateClueMarkerAndCircle e updateArrowDirectionAndColor
+            // dependem de isMapInitialized, que só é true após a primeira geolocationSuccess
+            if (isMapInitialized) {
+                updateClueMarkerAndCircle();
+                updateArrowDirectionAndColor();
+            }
+
 
             // Para atualizações de localização subsequentes, verifica a proximidade da pista
             const currentClue = TREASURE_HUNT_CLUES[currentClueIndex];
@@ -560,6 +565,9 @@
             startScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
             showLoading();
+
+            // Exibe a primeira pista imediatamente ao iniciar o jogo
+            displayClue();
 
             if (navigator.geolocation) {
                 watchId = navigator.geolocation.watchPosition(
