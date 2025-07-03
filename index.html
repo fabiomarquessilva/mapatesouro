@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça ao Tesouro Pirata</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Leaflet CSS para o mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzxHlY/QfBoSLzQmFLPsojB8jYM="
+        crossorigin=""/>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/4K9stVbLoginGmfExkX/I="
+        crossorigin=""></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* Verde claro para um tema de aventura */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        #app-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Cantos mais arredondados */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        #map {
+            height: 300px; /* Altura fixa para o mapa */
+            width: 100%;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+        }
+        .message-box {
+            background-color: #fff7ed;
+            border-left: 4px solid #f97316;
+            color: #ea580c;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            text-align: left;
+        }
+        .button-primary {
+            background-color: #10b981; /* Verde esmeralda */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .button-primary:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+        .button-primary:active {
+            background-color: #047857;
+            transform: translateY(0);
+        }
+        .clue-card {
+            background-color: #ecfdf5; /* Verde claro para a pista */
+            border: 1px solid #a7f3d0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: left;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+        .clue-card h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+        }
+        .clue-card p {
+            font-size: 1.125rem;
+            color: #064e3b;
+            line-height: 1.6;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #10b981;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Caça ao Tesouro Pirata! 🏴‍☠️</h1>
+
+        <div id="start-screen">
+            <p class="text-lg text-gray-600 mb-6">Prepare-se para uma aventura emocionante! Siga as pistas para encontrar o tesouro escondido.</p>
+            <button id="startButton" class="button-primary">Iniciar Caça ao Tesouro</button>
+        </div>
+
+        <div id="game-screen" class="hidden">
+            <div id="map"></div>
+            <div id="status" class="text-gray-700 text-sm mt-2">Aguardando sua localização...</div>
+            <div id="clue-display" class="clue-card mt-4 hidden">
+                <h2 id="clue-title">Pista Atual</h2>
+                <p id="clue-text"></p>
+                <p id="next-hint" class="text-gray-500 text-sm italic mt-2"></p>
+            </div>
+            <div id="final-message" class="clue-card mt-4 hidden">
+                <h2 class="text-2xl font-bold text-green-700">Tesouro Encontrado! 🎉</h2>
+                <p class="text-lg text-green-800" id="secret-message"></p>
+            </div>
+            <div id="error-message" class="message-box hidden"></div>
+            <div id="loading-indicator" class="loading-spinner hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game configuration
+        const TREASURE_HUNT_CLUES = [
+            {
+                id: 0,
+                latitude: -6.775780, // Pista Churrasqueira
+                longitude: -38.240988,
+                clueText: "Olá, pequena pirata! Sua primeira pista está na churrasqueira. Procure por algo brilhante perto do espeto!",
+                nextHint: "A próxima pista está onde os carros entram e saem, perto de um portão grande.",
+                found: false
+            },
+            {
+                id: 1,
+                latitude: -6.776213, // Pista Guarita
+                longitude: -38.241104,
+                clueText: "Muito bem! Você encontrou a segunda pista na guarita! Agora, volte para a churrasqueira, mas olhe bem de perto, tem outro segredo lá!",
+                nextHint: "A próxima pista está onde a comida fica gostosa e o cheirinho é bom, perto da churrasqueira de novo!",
+                found: false
+            },
+            {
+                id: 2,
+                latitude: -6.775925, // Pista Churrasqueira (segunda vez)
+                longitude: -38.240842,
+                clueText: "Uau, você é uma ótima caçadora de tesouros! A penúltima pista está na sala de jogos. Procure por algo escondido perto dos brinquedos!",
+                nextHint: "A próxima pista está onde a diversão acontece, com muitos jogos e risadas.",
+                found: false
+            },
+            {
+                id: 3,
+                latitude: -6.775893, // Pista Sala de Jogos
+                longitude: -38.241062,
+                clueText: "Quase lá! Você encontrou a pista da sala de jogos! Agora, suba a escada do Bloco C, o tesouro está quase à vista!",
+                nextHint: "A próxima pista está onde você sobe para chegar no seu andar, no Bloco C.",
+                found: false
+            },
+            {
+                id: 4,
+                latitude: -6.775842, // Pista Escada Bloco C
+                longitude: -38.241144,
+                clueText: "Excelente! Você está muito perto! A área gourmet te espera com a próxima pista. Procure por algo que brilha na cozinha!",
+                nextHint: "A próxima pista está onde se prepara comidas deliciosas, na área gourmet.",
+                found: false
+            },
+            {
+                id: 5,
+                latitude: -6.775936, // Pista Área Gourmet
+                longitude: -38.241007,
+                clueText: "Incrível! A área gourmet revelou seu segredo! Agora, vá para onde o carro do papai está estacionado, o tesouro está quase em suas mãos!",
+                nextHint: "A próxima pista está perto do carro grande do papai.",
+                found: false
+            },
+            {
+                id: 6,
+                latitude: -6.775940, // Pista Carro do Papai
+                longitude: -38.241271,
+                clueText: "Parabéns, aventureira! Você encontrou a última pista! Agora, o tesouro final te espera no lugar mais especial de todos...",
+                nextHint: "Volte para o seu apartamento, o segredo final está te esperando lá!",
+                found: false
+            }
+        ];
+
+        const FINAL_SECRET_MESSAGE = "Volte para seu apartamento e dê um abraço na mamãe!";
+        const PROXIMITY_RADIUS_METERS = 20; // Radius in meters to consider a clue found
+
+        let currentClueIndex = 0;
+        let watchId; // To store the watchPosition ID
+        let map;
+        let userMarker;
+        let clueMarker;
+        let isMapInitialized = false; // New flag to track map initialization
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const startButton = document.getElementById('startButton');
+        const statusDiv = document.getElementById('status');
+        const clueDisplay = document.getElementById('clue-display');
+        const clueTitle = document.getElementById('clue-title');
+        const clueText = document.getElementById('clue-text');
+        const nextHint = document.getElementById('next-hint');
+        const finalMessageDiv = document.getElementById('final-message');
+        const secretMessageP = document.getElementById('secret-message');
+        const errorMessageDiv = document.getElementById('error-message');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        // Function to show a message box
+        function showMessageBox(message, type = 'error') {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.className = `message-box ${type === 'error' ? 'bg-red-100 border-red-500 text-red-700' : 'bg-blue-100 border-blue-500 text-blue-700'}`;
+            errorMessageDiv.classList.remove('hidden');
+        }
+
+        // Function to hide the message box
+        function hideMessageBox() {
+            errorMessageDiv.classList.add('hidden');
+        }
+
+        // Function to show loading indicator
+        function showLoading() {
+            loadingIndicator.classList.remove('hidden');
+        }
+
+        // Function to hide loading indicator
+        function hideLoading() {
+            loadingIndicator.classList.add('hidden');
+        }
+
+        // Function to initialize the map
+        function initMap(latitude, longitude) {
+            if (map) {
+                map.remove(); // Remove existing map if any
+            }
+            map = L.map('map').setView([latitude, longitude], 17); // Initial view with zoom
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            userMarker = L.marker([latitude, longitude]).addTo(map)
+                .bindPopup("Você está aqui!")
+                .openPopup();
+
+            isMapInitialized = true; // Set flag to true after map is initialized
+            // The clue marker will be added by displayClue() once the map is ready
+        }
+
+        // Function to update user marker position on the map
+        function updateUserMarker(latitude, longitude) {
+            if (userMarker) {
+                userMarker.setLatLng([latitude, longitude]);
+                map.setView([latitude, longitude]); // Keep map centered on user
+            }
+        }
+
+        // Function to update the clue marker position on the map
+        function updateClueMarker() {
+            // Ensure map is initialized before adding clue marker
+            if (!isMapInitialized) {
+                return;
+            }
+            if (clueMarker) {
+                map.removeLayer(clueMarker); // Remove old clue marker
+            }
+            const targetClue = TREASURE_HUNT_CLUES[currentClueIndex];
+            if (targetClue) {
+                clueMarker = L.marker([targetClue.latitude, targetClue.longitude]).addTo(map)
+                    .bindPopup("Próxima Pista!")
+                    .openPopup();
+            }
+        }
+
+        // Function to calculate distance between two coordinates (Haversine formula)
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // metres
+            const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            const d = R * c; // in metres
+            return d;
+        }
+
+        // Function to display the current clue
+        function displayClue() {
+            // Ensure map is initialized before displaying clues that rely on it
+            if (!isMapInitialized) {
+                return;
+            }
+
+            const clue = TREASURE_HUNT_CLUES[currentClueIndex];
+            if (clue) {
+                clueTitle.textContent = `Pista ${currentClueIndex + 1}`;
+                clueText.textContent = clue.clueText;
+                nextHint.textContent = `Dica: ${clue.nextHint}`;
+                clueDisplay.classList.remove('hidden');
+                updateClueMarker(); // Update clue marker on map
+            } else {
+                // All clues found, display final message
+                clueDisplay.classList.add('hidden');
+                finalMessageDiv.classList.remove('hidden');
+                secretMessageP.textContent = FINAL_SECRET_MESSAGE;
+                statusDiv.textContent = "Tesouro Encontrado!";
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId); // Stop watching location
+                }
+                if (clueMarker) {
+                    map.removeLayer(clueMarker); // Remove clue marker
+                }
+            }
+        }
+
+        // Success callback for geolocation
+        function geolocationSuccess(position) {
+            hideLoading();
+            hideMessageBox();
+
+            const { latitude, longitude, accuracy } = position.coords;
+            statusDiv.textContent = `Sua localização: Lat ${latitude.toFixed(5)}, Lon ${longitude.toFixed(5)} (Precisão: ${accuracy.toFixed(1)}m)`;
+
+            // Initialize map if not already initialized
+            if (!map) {
+                initMap(latitude, longitude);
+                // After the map is initialized for the first time, display the first clue
+                displayClue();
+            } else {
+                updateUserMarker(latitude, longitude);
+            }
+
+            // For subsequent location updates, check for clue proximity
+            const currentClue = TREASURE_HUNT_CLUES[currentClueIndex];
+            if (currentClue && !currentClue.found) {
+                const distance = getDistance(latitude, longitude, currentClue.latitude, currentClue.longitude);
+                statusDiv.textContent += ` | Distância para a próxima pista: ${distance.toFixed(1)}m`;
+
+                if (distance <= PROXIMITY_RADIUS_METERS) {
+                    currentClue.found = true;
+                    showMessageBox(`Pista ${currentClueIndex + 1} encontrada!`, 'info');
+                    setTimeout(() => {
+                        hideMessageBox();
+                        currentClueIndex++;
+                        displayClue(); // Show the next clue or final message
+                    }, 3000); // Show message for 3 seconds
+                }
+            }
+        }
+
+        // Error callback for geolocation
+        function geolocationError(error) {
+            hideLoading();
+            let message = "Erro ao obter a localização.";
+            let troubleshootingTip = "Por favor, verifique se o GPS do seu aparelho está ligado, se o navegador tem permissão para acessar sua localização e tente recarregar a página.";
+
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "Permissão de localização negada. Por favor, habilite a localização nas configurações do seu navegador ou do site.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "Informações de localização indisponíveis. O sinal de GPS pode estar fraco ou bloqueado.";
+                    break;
+                case error.TIMEOUT:
+                    message = "Tempo limite excedido ao tentar obter a localização. O sinal pode estar demorando muito para ser obtido.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    message = "Ocorreu um erro desconhecido ao tentar obter a localização.";
+                    break;
+            }
+            showMessageBox(`${message} ${troubleshootingTip}`);
+            statusDiv.textContent = message;
+        }
+
+        // Start the treasure hunt
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            showLoading();
+
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    geolocationSuccess,
+                    geolocationError,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                showMessageBox("Seu navegador não suporta geolocalização. Por favor, use um navegador compatível.");
+                hideLoading();
+            }
+        });
+
+        // Initial setup on window load
+        window.onload = () => {
+            // No initial map load, it will be loaded when GPS is first obtained
+        };
+    </script>
+</body>
+</html>
