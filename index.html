@@ -86,6 +86,24 @@
             color: #666666;
             cursor: not-allowed;
         }
+        .button-secondary { /* Estilo para o botão Pular Pista */
+            background-color: #6b7280; /* Cinza */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: normal;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-size: 0.875rem;
+        }
+        .button-secondary:hover {
+            background-color: #4b5563;
+            transform: translateY(-1px);
+        }
+        .button-secondary:active {
+            background-color: #374151;
+            transform: translateY(0);
+        }
         .clue-card {
             background-color: #ecfdf5; /* Verde claro para a pista */
             border: 1px solid #a7f3d0;
@@ -155,6 +173,7 @@
                 <p id="next-hint" class="text-gray-500 text-sm italic mt-2"></p>
             </div>
             <button id="foundClueButton" class="button-primary mt-4 button-disabled" disabled>Encontrei a Pista!</button>
+            <button id="skipClueButton" class="button-secondary mt-2">Pular Pista</button> <!-- Novo botão -->
             <div id="final-message" class="clue-card mt-4 hidden">
                 <h2 class="text-2xl font-bold text-green-700">Tesouro Encontrado! 🎉</h2>
                 <p class="text-lg text-green-800" id="secret-message"></p>
@@ -249,6 +268,7 @@
         const clueText = document.getElementById('clue-text');
         const nextHint = document.getElementById('next-hint');
         const foundClueButton = document.getElementById('foundClueButton'); // Novo botão
+        const skipClueButton = document.getElementById('skipClueButton'); // Novo botão Pular Pista
         const finalMessageDiv = document.getElementById('final-message');
         const secretMessageP = document.getElementById('secret-message');
         const errorMessageDiv = document.getElementById('error-message');
@@ -256,6 +276,7 @@
 
         // Função para exibir uma caixa de mensagem
         function showMessageBox(message, type = 'error') {
+            console.log("Mostrando mensagem:", message);
             errorMessageDiv.textContent = message;
             errorMessageDiv.className = `message-box ${type === 'error' ? 'bg-red-100 border-red-500 text-red-700' : 'bg-blue-100 border-blue-500 text-blue-700'}`;
             errorMessageDiv.classList.remove('hidden');
@@ -263,56 +284,78 @@
 
         // Função para esconder a caixa de mensagem
         function hideMessageBox() {
+            console.log("Escondendo mensagem.");
             errorMessageDiv.classList.add('hidden');
         }
 
         // Função para exibir o indicador de carregamento
         function showLoading() {
+            console.log("Mostrando indicador de carregamento.");
             loadingIndicator.classList.remove('hidden');
         }
 
         // Função para esconder o indicador de carregamento
         function hideLoading() {
+            console.log("Escondendo indicador de carregamento.");
             loadingIndicator.classList.add('hidden');
         }
 
         // Função para inicializar o mapa
         function initMap(latitude, longitude) {
+            console.log("Tentando inicializar mapa em:", latitude, longitude);
+            // Verifica se a biblioteca Leaflet (L) está definida antes de usá-la
+            if (typeof L === 'undefined') {
+                console.error("Leaflet (L) não está definido. Não é possível inicializar o mapa.");
+                showMessageBox("Erro ao carregar o mapa. Verifique sua conexão com a internet ou se o Leaflet foi carregado corretamente. Recarregue a página.", 'error');
+                return;
+            }
+
             if (map) {
                 map.remove(); // Remove o mapa existente, se houver
+                console.log("Mapa existente removido.");
             }
             map = L.map('map').setView([latitude, longitude], 17); // Visão inicial com zoom
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            userMarker = L.marker([latitude, longitude]).addTo(map)
-                .bindPopup("Você está aqui!")
-                .openPopup();
+            // O marcador do usuário será adicionado/atualizado por geolocationSuccess
+            // e a seta direcional por updateArrowDirectionAndColor
 
             isMapInitialized = true; // Define a flag como true após a inicialização do mapa
-            // O marcador da pista e o círculo serão adicionados por displayClue() assim que o mapa estiver pronto
+            console.log("Mapa inicializado. isMapInitialized =", isMapInitialized);
         }
 
         // Função para atualizar a posição do marcador do usuário no mapa
         function updateUserMarker(latitude, longitude) {
+            console.log("Atualizando marcador do usuário para:", latitude, longitude);
             if (userMarker) {
                 userMarker.setLatLng([latitude, longitude]);
                 map.setView([latitude, longitude]); // Mantém o mapa centralizado no usuário
+            } else if (isMapInitialized) {
+                // Se o mapa já está inicializado mas o marcador do usuário não, crie-o
+                userMarker = L.marker([latitude, longitude]).addTo(map)
+                    .bindPopup("Você está aqui!")
+                    .openPopup();
+                console.log("Marcador do usuário criado e adicionado ao mapa.");
             }
         }
 
         // Função para atualizar a posição do marcador da pista e o círculo no mapa
         function updateClueMarkerAndCircle() {
+            console.log("Atualizando marcador da pista e círculo.");
             // Garante que o mapa esteja inicializado antes de adicionar o marcador da pista
             if (!isMapInitialized) {
+                console.log("Mapa não inicializado, não é possível atualizar marcador da pista/círculo.");
                 return;
             }
             if (clueMarker) {
                 map.removeLayer(clueMarker); // Remove o marcador da pista antiga
+                console.log("Marcador de pista antigo removido.");
             }
             if (proximityCircle) {
                 map.removeLayer(proximityCircle); // Remove o círculo antigo
+                console.log("Círculo de proximidade antigo removido.");
             }
 
             const targetClue = TREASURE_HUNT_CLUES[currentClueIndex];
@@ -320,6 +363,7 @@
                 clueMarker = L.marker([targetClue.latitude, targetClue.longitude]).addTo(map)
                     .bindPopup("Próxima Pista!")
                     .openPopup();
+                console.log("Novo marcador de pista adicionado em:", targetClue.latitude, targetClue.longitude);
 
                 // Adiciona o círculo de proximidade
                 proximityCircle = L.circle([targetClue.latitude, targetClue.longitude], {
@@ -328,6 +372,7 @@
                     fillOpacity: 0.2,
                     radius: PROXIMITY_RADIUS_FOR_BUTTON_ACTIVATION
                 }).addTo(map);
+                console.log("Círculo de proximidade adicionado com raio:", PROXIMITY_RADIUS_FOR_BUTTON_ACTIVATION);
             }
         }
 
@@ -366,11 +411,14 @@
 
         // Função para atualizar a direção e a cor da seta
         function updateArrowDirectionAndColor() {
+            console.log("Atualizando direção e cor da seta.");
             if (!isMapInitialized || !userMarker || currentClueIndex >= TREASURE_HUNT_CLUES.length) {
+                console.log("Não é possível atualizar a seta: mapa não inicializado ou todas as pistas encontradas.");
                 // Mapa não pronto, marcador do usuário não definido ou todas as pistas encontradas
                 if (directionArrowMarker) {
                     map.removeLayer(directionArrowMarker);
                     directionArrowMarker = null;
+                    console.log("Marcador de seta removido.");
                 }
                 return;
             }
@@ -396,6 +444,8 @@
             // Determina a cor da seta com base no alinhamento (ex: dentro de +/- 30 graus)
             const isCorrectDirection = normalizedAngleDiff <= 30; // Dentro de 30 graus do alvo
             const arrowColor = isCorrectDirection ? '#10b981' : '#ef4444'; // Verde ou Vermelho
+            console.log(`Seta: Direção para o alvo: ${bearingToTarget.toFixed(2)}°, Orientação do dispositivo: ${lastKnownHeading.toFixed(2)}°, Ângulo de rotação: ${rotationAngle.toFixed(2)}°, Cor: ${arrowColor}`);
+
 
             // Cria ou atualiza o ícone personalizado da seta
             const arrowIconHtml = `
@@ -407,7 +457,7 @@
                     border-bottom: 20px solid ${arrowColor};
                     transform: rotate(${rotationAngle}deg); /* Gira a seta */
                     transform-origin: 50% 75%; /* Gira em torno de sua base */
-                    transition: transform 0.1s linear; /* Rotação suave */
+                    transition: transform 0.1s linear; /* Smooth rotation */
                 "></div>
             `;
 
@@ -420,9 +470,11 @@
 
             if (!directionArrowMarker) {
                 directionArrowMarker = L.marker(userLatLng, { icon: customArrowIcon }).addTo(map);
+                console.log("Marcador de seta criado.");
             } else {
                 directionArrowMarker.setLatLng(userLatLng);
                 directionArrowMarker.setIcon(customArrowIcon);
+                console.log("Marcador de seta atualizado.");
             }
         }
 
@@ -431,72 +483,87 @@
             // alpha é a direção da bússola (0-360 graus, 0 é Norte)
             if (event.alpha !== null) {
                 lastKnownHeading = event.alpha;
+                // console.log("Orientação do dispositivo (alpha):", event.alpha); // Log para depuração da bússola
                 updateArrowDirectionAndColor();
             }
         }
 
         // Função para exibir a pista atual
         function displayClue() {
+            console.log("Dentro de displayClue(). currentClueIndex:", currentClueIndex);
             const clue = TREASURE_HUNT_CLUES[currentClueIndex];
             if (clue) {
+                console.log("Pista a ser exibida:", clue.clueText);
                 clueTitle.textContent = `Pista ${currentClueIndex + 1}`;
                 clueText.textContent = clue.clueText;
                 nextHint.textContent = `Dica: ${clue.nextHint}`;
-                clueDisplay.classList.remove('hidden');
+                clueDisplay.classList.remove('hidden'); // Isso deve tornar o elemento visível
+                console.log("clue-display deveria estar visível.");
                 foundClueButton.classList.add('button-disabled'); // Desabilita o botão ao exibir nova pista
                 foundClueButton.disabled = true;
 
                 // Atualiza o mapa e a seta SOMENTE se o mapa já estiver inicializado
                 if (isMapInitialized) {
+                    console.log("Mapa inicializado, atualizando marcadores e seta.");
                     updateClueMarkerAndCircle(); // Atualiza o marcador da pista e o círculo no mapa
                     updateArrowDirectionAndColor(); // Atualiza a seta direcional para a nova pista
+                } else {
+                    console.log("Mapa ainda não inicializado, marcadores e seta aguardando a primeira localização GPS.");
                 }
             } else {
+                console.log("Todas as pistas encontradas ou índice de pista inválido. Exibindo mensagem final.");
                 // Todas as pistas encontradas, exibe a mensagem final
                 clueDisplay.classList.add('hidden');
                 foundClueButton.classList.add('hidden'); // Esconde o botão
+                skipClueButton.classList.add('hidden'); // Esconde o botão Pular Pista
                 finalMessageDiv.classList.remove('hidden');
                 secretMessageP.textContent = FINAL_SECRET_MESSAGE;
                 statusDiv.textContent = "Tesouro Encontrado!";
                 if (watchId) {
                     navigator.geolocation.clearWatch(watchId); // Para de observar a localização
+                    console.log("Observação de localização parada.");
                 }
                 if (clueMarker) {
                     map.removeLayer(clueMarker); // Remove o marcador da pista
+                    console.log("Marcador de pista removido.");
                 }
                 if (proximityCircle) { // Remove o círculo de proximidade
                     map.removeLayer(proximityCircle);
+                    console.log("Círculo de proximidade removido.");
                 }
                 // Remove o marcador da seta direcional quando o jogo termina
                 if (directionArrowMarker) {
                     map.removeLayer(directionArrowMarker);
                     directionArrowMarker = null;
+                    console.log("Marcador de seta direcional removido.");
                 }
                 // Remove o listener de orientação do dispositivo
                 window.removeEventListener('deviceorientation', handleOrientation);
+                console.log("Listener de orientação do dispositivo removido.");
             }
         }
 
         // Callback de sucesso para geolocalização
         function geolocationSuccess(position) {
+            console.log("Sucesso na geolocalização. Posição:", position.coords.latitude, position.coords.longitude, "Precisão:", position.coords.accuracy);
             hideLoading();
             hideMessageBox();
 
             const { latitude, longitude, accuracy } = position.coords;
             statusDiv.textContent = `Sua localização: Lat ${latitude.toFixed(5)}, Lon ${longitude.toFixed(5)} (Precisão: ${accuracy.toFixed(1)}m)`;
 
-            // Inicializa o mapa se ainda não foi inicializado
-            if (!map) {
-                initMap(latitude, longitude);
-                // Após a inicialização do mapa pela primeira vez, exibe a primeira pista
-                // displayClue() já é chamada no startButton click, então não precisamos chamar aqui novamente
-            } else {
+            // Atualiza o marcador do usuário no mapa
+            if (isMapInitialized) { // Garante que o mapa já foi inicializado
                 updateUserMarker(latitude, longitude);
+            } else {
+                // Se o mapa ainda não foi inicializado (primeira leitura do GPS), inicializa-o aqui
+                initMap(latitude, longitude);
+                updateUserMarker(latitude, longitude); // Adiciona o marcador do usuário após initMap
+                // Depois que o mapa é inicializado, chame displayClue para garantir que os marcadores da pista e seta sejam adicionados
+                displayClue();
             }
 
             // Garante que a seta e o círculo sejam atualizados com a nova posição do usuário
-            // Isso é importante porque updateClueMarkerAndCircle e updateArrowDirectionAndColor
-            // dependem de isMapInitialized, que só é true após a primeira geolocationSuccess
             if (isMapInitialized) {
                 updateClueMarkerAndCircle();
                 updateArrowDirectionAndColor();
@@ -508,12 +575,19 @@
             if (currentClue && !currentClue.found) {
                 const distance = getDistance(latitude, longitude, currentClue.latitude, currentClue.longitude);
                 statusDiv.textContent += ` | Distância para a próxima pista: ${distance.toFixed(1)}m`;
+                console.log("Distância para a próxima pista:", distance.toFixed(1), "m");
 
                 // Ativa/desativa o botão "Encontrei a Pista!"
                 if (distance <= PROXIMITY_RADIUS_FOR_BUTTON_ACTIVATION) {
+                    if (foundClueButton.disabled) {
+                        console.log("Botão 'Encontrei a Pista!' ativado.");
+                    }
                     foundClueButton.classList.remove('button-disabled');
                     foundClueButton.disabled = false;
                 } else {
+                    if (!foundClueButton.disabled) {
+                        console.log("Botão 'Encontrei a Pista!' desativado.");
+                    }
                     foundClueButton.classList.add('button-disabled');
                     foundClueButton.disabled = true;
                 }
@@ -522,34 +596,42 @@
 
         // Callback de erro para geolocalização
         function geolocationError(error) {
+            console.error("Erro na geolocalização:", error.code, error.message);
             hideLoading();
             let message = "Erro ao obter a localização.";
-            let troubleshootingTip = "Por favor, verifique se o GPS do seu aparelho está ligado, se o navegador tem permissão para acessar sua localização e tente recarregar a página.";
+            let troubleshootingTip = "";
 
             switch (error.code) {
                 case error.PERMISSION_DENIED:
-                    message = "Permissão de localização negada. Por favor, habilite a localização nas configurações do seu navegador ou do site.";
+                    message = "Permissão de localização negada.";
+                    if (error.message.includes("permissions policy")) {
+                        troubleshootingTip = "Este jogo está sendo executado em um ambiente que bloqueia o acesso à sua localização (política de permissões). Para continuar a brincadeira, você pode usar o botão 'Pular Pista' para avançar manualmente.";
+                    } else {
+                        troubleshootingTip = "Por favor, habilite a localização nas configurações do seu navegador ou do site. Verifique também as configurações de privacidade do seu aparelho.";
+                    }
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    message = "Informações de localização indisponíveis. O sinal de GPS pode estar fraco ou bloqueado.";
+                    message = "Informações de localização indisponíveis.";
+                    troubleshootingTip = "O sinal de GPS pode estar fraco ou bloqueado. Tente ir para uma área aberta.";
                     break;
                 case error.TIMEOUT:
-                    message = "Tempo limite excedido ao tentar obter a localização. O sinal pode estar demorando muito para ser obtido.";
+                    message = "Tempo limite excedido ao tentar obter a localização.";
+                    troubleshootingTip = "O sinal pode estar demorando muito para ser obtido. Tente recarregar a página ou ir para uma área com melhor sinal.";
                     break;
                 case error.UNKNOWN_ERROR:
                     message = "Ocorreu um erro desconhecido ao tentar obter a localização.";
+                    troubleshootingTip = "Tente recarregar a página ou verificar as configurações do seu navegador.";
                     break;
             }
-            showMessageBox(`${message} ${troubleshootingTip}`);
+            showMessageBox(`${message} ${troubleshootingTip}`, 'error');
             statusDiv.textContent = message;
         }
 
         // Função para ativar a próxima pista manualmente
         function activateClueManually() {
+            console.log("Botão 'Encontrei a Pista!' clicado.");
             const currentClue = TREASURE_HUNT_CLUES[currentClueIndex];
             if (currentClue && !currentClue.found) {
-                // Poderíamos adicionar uma verificação de proximidade aqui novamente,
-                // mas como o botão só ativa perto, a confiança é maior.
                 currentClue.found = true;
                 showMessageBox(`Pista ${currentClueIndex + 1} encontrada!`, 'info');
                 setTimeout(() => {
@@ -560,16 +642,47 @@
             }
         }
 
+        // Função para pular a pista (controle parental)
+        function skipClue() {
+            console.log("Botão 'Pular Pista' clicado.");
+            if (currentClueIndex < TREASURE_HUNT_CLUES.length) {
+                showMessageBox(`Pista ${currentClueIndex + 1} pulada!`, 'info');
+                TREASURE_HUNT_CLUES[currentClueIndex].found = true; // Marca como encontrada para não voltar
+                setTimeout(() => {
+                    hideMessageBox();
+                    currentClueIndex++;
+                    displayClue(); // Exibe a próxima pista ou a mensagem final
+                }, 1500);
+            }
+        }
+
+
         // Inicia a caça ao tesouro
         startButton.addEventListener('click', () => {
+            console.log("Botão 'Iniciar Caça ao Tesouro' clicado.");
             startScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
+            console.log("Tela do jogo visível.");
             showLoading();
 
-            // Exibe a primeira pista imediatamente ao iniciar o jogo
+            // Exibe a primeira pista imediatamente ao iniciar o jogo (texto apenas)
             displayClue();
+            console.log("displayClue() chamado no início para exibir texto da pista.");
+
+            // Inicializa o mapa com as coordenadas da primeira pista como fallback
+            const firstClue = TREASURE_HUNT_CLUES[0];
+            if (firstClue) {
+                initMap(firstClue.latitude, firstClue.longitude);
+                console.log("Mapa inicializado com a primeira pista.");
+            } else {
+                // Se não houver pistas, tenta inicializar com uma localização padrão ou exibe erro
+                initMap(-6.775780, -38.240988); // Coordenada de fallback se TREASURE_HUNT_CLUES estiver vazio
+                console.log("Mapa inicializado com coordenadas de fallback (sem pistas definidas).");
+            }
+
 
             if (navigator.geolocation) {
+                console.log("Iniciando watchPosition para geolocalização.");
                 watchId = navigator.geolocation.watchPosition(
                     geolocationSuccess,
                     geolocationError,
@@ -582,12 +695,15 @@
 
                 // Solicita permissão para DeviceOrientationEvent em iOS 13+
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    console.log("Tentando solicitar permissão de orientação do dispositivo (iOS 13+).");
                     DeviceOrientationEvent.requestPermission()
                         .then(permissionState => {
                             if (permissionState === 'granted') {
                                 window.addEventListener('deviceorientation', handleOrientation);
+                                console.log("Permissão de orientação do dispositivo concedida.");
                             } else {
                                 showMessageBox("Permissão de orientação do dispositivo negada. A seta direcional não funcionará.", 'info');
+                                console.log("Permissão de orientação do dispositivo negada.");
                             }
                         })
                         .catch(error => {
@@ -596,20 +712,25 @@
                         });
                 } else {
                     // Para navegadores que não são iOS 13+ ou versões mais antigas do Safari
+                    console.log("Adicionando listener de orientação do dispositivo (não iOS 13+).");
                     window.addEventListener('deviceorientation', handleOrientation);
                 }
 
             } else {
                 showMessageBox("Seu navegador não suporta geolocalização. Por favor, use um navegador compatível.");
                 hideLoading();
+                console.log("Navegador não suporta geolocalização.");
             }
         });
 
-        // Adiciona o listener para o novo botão
+        // Adiciona o listener para o botão "Encontrei a Pista!"
         foundClueButton.addEventListener('click', activateClueManually);
+        // Adiciona o listener para o botão "Pular Pista"
+        skipClueButton.addEventListener('click', skipClue);
 
         // Configuração inicial ao carregar a janela
         window.onload = () => {
+            console.log("Página carregada.");
             // O mapa será carregado quando o GPS for obtido pela primeira vez
         };
     </script>
