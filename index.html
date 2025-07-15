@@ -21,6 +21,17 @@
         .hidden {
             display: none;
         }
+        .email-preview {
+            white-space: pre-wrap; /* Mantém as quebras de linha e espaços */
+            word-wrap: break-word; /* Quebra palavras longas */
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            color: #333;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -117,12 +128,28 @@
                         <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                              <button type="button" id="back-to-project-selection" class="text-sm text-gray-600 hover:text-gray-800 order-2 sm:order-1">&larr; Voltar para Seleção de Projeto</button>
                             <button type="submit" id="submit-button" class="w-full md:w-2/3 py-3 px-6 text-white font-bold text-lg rounded-lg shadow-md transition bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 order-1 sm:order-2">
-                                Enviar Dados via WhatsApp
+                                Pré-visualizar Mensagem
                             </button>
                         </div>
                     </div>
                 </form>
             </div>
+
+            <!-- Tela 4: Pré-visualização da Mensagem -->
+            <div id="preview-screen" class="hidden">
+                <h3 class="text-xl font-semibold mb-4 pb-2 border-b-2 border-gray-400 text-gray-700">5. Pré-visualização do E-mail</h3>
+                <p class="text-sm text-gray-600 mb-4">Este é o corpo do e-mail que será enviado. Por favor, revise antes de continuar.</p>
+                <div id="preview-message" class="email-preview">
+                    <!-- Mensagem formatada será inserida aqui -->
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                    <button type="button" id="back-to-form-btn" class="text-sm text-gray-600 hover:text-gray-800 order-2 sm:order-1">&larr; Voltar e Editar</button>
+                    <button type="button" id="send-by-email-btn" class="w-full md:w-1/2 py-3 px-6 text-white font-bold text-lg rounded-lg shadow-md transition bg-green-600 hover:bg-green-700 order-1 sm:order-2">
+                        Abrir Programa de E-mail
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -132,7 +159,7 @@
             // --- Configuração dos Projetos e Perguntas ---
             const projectConfig = {
               idosos: { name: "Idosos Institucionalizados (Abrigo Lucas Zorn)", whatsapp: "5584994420139", color: "green", bgColor: "bg-green-50", textColor: "text-green-800", buttonColor: "bg-green-600", intro: "Vou te fazer umas perguntas bem simples sobre sua fé ou sua ligação com Deus, tá certo? Não tem resposta certa ou errada, é só o que você sente, tá bom?", questions: [ { id: 1, adaptada: "O(a) senhor(a) sentiu vontade de se aproximar mais de Deus, conversar mais com Ele nesses últimos tempos?" }, { id: 2, adaptada: "Teve momentos que o(a) senhor(a) sentiu que precisava do carinho ou da proteção de Deus?" }, { id: 3, adaptada: "Rezou ou conversou com Deus pedindo ajuda, conforto ou um conselho sobre o que fazer?" }, { id: 4, adaptada: "O(a) senhor(a) procurou se fortalecer em Deus quando as coisas estavam difíceis?" }, { id: 5, adaptada: "O(a) senhor(a) costuma rezar por outras pessoas, como amigos, família, colegas daqui do abrigo?" }, { id: 6, adaptada: "O(a) senhor(a) chegou a pensar que essa situação pode estar servindo pra te tornar mais forte com a ajuda de Deus?" }, { id: 7, adaptada: "Sentiu vontade de conversar com Deus pra pedir perdão por algo que acredita que fez de errado?" }, { id: 8, adaptada: "Teve algum momento que sentiu como se Deus tivesse te deixado sozinho(a)?" }, { id: 9, adaptada: "Já pensou se Deus realmente te ama ou se te esqueceu?" }, { id: 10, adaptada: "Já sentiu que Deus tá te castigando por algo?" }, { id: 11, adaptada: "Já ficou com raiva de Deus por tudo que tá passando?" }, { id: 12, adaptada: "Pensou que tudo isso que está vivendo pode ser um castigo de Deus?" }, { id: 13, adaptada: "Acredita que Deus está te provando ou testando com essa situação?" }, { id: 14, adaptada: "Teve dias em que ficou difícil acreditar ou confiar em Deus?" }, ] },
-              cuidadores: { name: "Cuidadores de CRIANES (APAE)", whatsapp: "5583999992617", color: "pink", bgColor: "bg-pink-50", textColor: "text-pink-800", buttonColor: "bg-pink-600", intro: "A gente quer entender como a fé ajuda (ou não ajuda) no seu dia a dia com a criança. Pode responder como se estivesse contando sua rotina pra um amigo, tudo certo?", questions: [ { id: 1, adaptada: "Você buscou se aproximar mais de Deus nos momentos difíceis com seu filho(a)?" }, { id: 2, adaptada: "Sentiu que precisava da proteção de Deus diante dos desafios de cuidar da criança?" }, { id: 3, adaptada: "Você rezou ou meditou pedindo orientação ou consolo em situações difíceis?" }, { id: 4, adaptada: "Buscou forças em Deus para continuar lutando pelo cuidado da criança?" }, { id: 5, adaptada: "Você costuma rezar por outras pessoas, como por seu(sua) filho(a), familiares ou amigos?" }, { id: 6, adaptada: "Já pensou que Deus pode estar te dando força para enfrentar tudo isso?" }, { id: 7, adaptada: "Você pediu perdão a Deus por algo que acha que poderia ter feito diferente?" }, { id: 8, adaptada: "Sentiu que Deus te deixou sozinha(o) nesse cuidado todo?" }, { id: 9, adaptada: "Já teve dúvida se Deus te ama mesmo diante de tanto sofrimento?" }, { id: 10, adaptada: "Você pensou que tudo isso pode ser um castigo de Deus?" }, { id: 11, adaptada: "Já ficou com raiva de Deus por tudo que está vivendo?" }, { id: 12, adaptada: "Acreditou que os problemas são um castigo?" }, { id: 13, adaptada: "Você sentiu que tudo isso é um teste de Deus pra você?" }, { id: 14, adaptada: "Teve dificuldade em acreditar ou confiar em Deus durante esse processo?" }, ] },
+              cuidadores: { name: "Cuidadores de CRIANES (APAE)", whatsapp: "5583999992617", color: "pink", bgColor: "bg-pink-50", textColor: "text-pink-800", buttonColor: "bg-pink-600", intro: "A gente quer entender como a fé ajuda (ou não ajuda) no seu dia a dia com a criança. Pode responder como se estivesse contando sua rotina pra um amigo, tudo certo?", questions: [ { id: 1, adaptada: "Você buscou se aproximar mais de Deus nos momentos difíceis com seu filho(a)?" }, { id: 2, adaptada: "Sentiu que precisava da proteção de Deus diante dos desafios de cuidar da criança?" }, { id: 3, adaptada: "Você rezou ou meditou pedindo orientação ou consolo em situações difíceis?" }, { id: 4, adaptada: "Buscou forças em Deus para continuar luting pelo cuidado da criança?" }, { id: 5, adaptada: "Você costuma rezar por outras pessoas, como por seu(sua) filho(a), familiares ou amigos?" }, { id: 6, adaptada: "Já pensou que Deus pode estar te dando força para enfrentar tudo isso?" }, { id: 7, adaptada: "Você pediu perdão a Deus por algo que acha que poderia ter feito diferente?" }, { id: 8, adaptada: "Sentiu que Deus te deixou sozinha(o) nesse cuidado todo?" }, { id: 9, adaptada: "Já teve dúvida se Deus te ama mesmo diante de tanto sofrimento?" }, { id: 10, adaptada: "Você pensou que tudo isso pode ser um castigo de Deus?" }, { id: 11, adaptada: "Já ficou com raiva de Deus por tudo que está vivendo?" }, { id: 12, adaptada: "Acreditou que os problemas são um castigo?" }, { id: 13, adaptada: "Você sentiu que tudo isso é um teste de Deus pra você?" }, { id: 14, adaptada: "Teve dificuldade em acreditar ou confiar em Deus durante esse processo?" }, ] },
               dependentes: { name: "Usuários do CAPS AD (Dependentes Químicos)", whatsapp: "5583991007459", color: "orange", bgColor: "bg-orange-50", textColor: "text-orange-800", buttonColor: "bg-orange-600", intro: "A gente quer saber como a sua fé ou sua relação com Deus tem influenciado no seu tratamento. Pode responder com sinceridade, sem julgamento.", questions: [ { id: 1, adaptada: "Você tentou se aproximar mais de Deus nesse tempo de tratamento?" }, { id: 2, adaptada: "Buscou proteção e carinho de Deus nas horas difíceis?" }, { id: 3, adaptada: "Você orou, meditou ou conversou com Deus pedindo ajuda ou clareza?" }, { id: 4, adaptada: "Sentiu que precisava buscar forças em Deus pra vencer as recaídas ou a abstinência?" }, { id: 5, adaptada: "Você rezou por outras pessoas, como amigos, família ou colegas daqui do CAPS?" }, { id: 6, adaptada: "Pensou que, mesmo na dificuldade, Deus pode estar te fortalecendo?" }, { id: 7, adaptada: "Você pediu perdão a Deus por algo do seu passado?" }, { id: 8, adaptada: "Já teve a sensação de que Deus te deixou de lado?" }, { id: 9, adaptada: "Sentiu dúvida se Deus realmente se importa contigo?" }, { id: 10, adaptada: "Pensou que o vício ou as recaídas são um castigo de Deus?" }, { id: 11, adaptada: "Já sentiu raiva de Deus pelo que está passando?" }, { id: 12, adaptada: "Acreditou que tudo que passou é uma punição de Deus?" }, { id: 13, adaptada: "Sentiu que Deus estava te testando com as dificuldades?" }, { id: 14, adaptada: "Ficou difícil confiar em Deus em certos momentos?" }, ] },
             };
             const responseOptions = ["Nunca", "Raramente", "Às vezes", "Muitas vezes", "Sempre"];
@@ -144,6 +171,7 @@
                 studentId: '',
                 studentPhone: '',
                 projectKey: '',
+                mailtoUrl: '',
             };
 
             // --- Elementos da DOM ---
@@ -151,6 +179,7 @@
                 studentInfo: document.getElementById('student-info-screen'),
                 projectSelection: document.getElementById('project-selection-screen'),
                 dataCollection: document.getElementById('data-collection-screen'),
+                preview: document.getElementById('preview-screen'),
             };
             const studentForm = document.getElementById('student-form');
             const projectButtonsContainer = document.getElementById('project-buttons-container');
@@ -158,9 +187,12 @@
             const questionsIntro = document.getElementById('questions-intro');
             const questionsList = document.getElementById('questions-list');
             const statusMessage = document.getElementById('status-message');
-            const submitButton = document.getElementById('submit-button');
             const backToStudentInfoBtn = document.getElementById('back-to-student-info');
             const backToProjectSelectionBtn = document.getElementById('back-to-project-selection');
+            const previewMessageContainer = document.getElementById('preview-message');
+            const sendByEmailBtn = document.getElementById('send-by-email-btn');
+            const backToFormBtn = document.getElementById('back-to-form-btn');
+
 
             // --- Funções de Navegação ---
             const navigateTo = (screenName) => {
@@ -239,11 +271,8 @@
                 return "";
             };
 
-            const formatAndShareMessage = (formData) => {
-                statusMessage.textContent = 'Preparando mensagem para o WhatsApp...';
-                statusMessage.className = 'mb-4 font-semibold text-blue-600';
-                submitButton.disabled = true;
-
+            const generatePreview = (formData) => {
+                statusMessage.textContent = '';
                 try {
                     const project = projectConfig[formData.projectKey];
                     
@@ -254,53 +283,58 @@
                     const positiveInterpretation = getInterpretation(positiveScore, 'positive');
                     const negativeInterpretation = getInterpretation(negativeScore, 'negative');
 
-                    let message = `*Relatório de Avaliação - CER-Breve-14*\n\n`;
-                    message += `*Projeto:* ${project.name}\n`;
-                    message += `*Data:* ${new Date().toLocaleString('pt-BR')}\n\n`;
+                    // Gerar o corpo do e-mail (texto plano com quebras de linha)
+                    let emailBody = `UNIVERSIDADE FEDERAL DE CAMPINA GRANDE\n`;
+                    emailBody += `CENTRO DE FORMAÇÃO DE PROFESSORES\n`;
+                    emailBody += `UNIDADE ACADÊMICA DE ENFERMAGEM\n`;
+                    emailBody += `PROGRAMA DE EXTENSÃO ESPIRITUALIDADE E SAÚDE MENTAL\n\n`;
+                    emailBody += `------------------------------------\n\n`;
 
-                    message += `*Dados do Extensionista:*\n`;
-                    message += `Nome: ${formData.studentName}\n`;
-                    message += `Matrícula: ${formData.studentId}\n`;
-                    message += `Contato: ${formData.studentPhone}\n\n`;
-
-                    message += `*Dados do Participante:*\n`;
-                    message += `Nome: ${formData.participantName}\n`;
-                    message += `Idade: ${formData.participantAge}\n`;
-                    message += `Sexo: ${formData.participantSex}\n\n`;
-
-                    message += `*Resultados da Escala:*\n`;
-                    message += `CER Positivo (Itens 1-7): *${positiveScore}*\n`;
-                    message += `CER Negativo (Itens 8-14): *${negativeScore}*\n\n`;
-
-                    message += `*Perfil Espiritual (Interpretação):*\n`;
-                    message += `Coping Positivo: *${positiveInterpretation}*\n`;
-                    message += `Coping Negativo: *${negativeInterpretation}*\n\n`;
-
-                    message += `*Respostas Detalhadas:*\n`;
+                    emailBody += `RELATÓRIO DE AVALIAÇÃO - CER-BREVE-14\n\n`;
+                    emailBody += `Projeto: ${project.name}\n`;
+                    emailBody += `Data: ${new Date().toLocaleString('pt-BR')}\n\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `DADOS DO EXTENSIONISTA\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `Nome: ${formData.studentName}\n`;
+                    emailBody += `Matrícula: ${formData.studentId}\n`;
+                    emailBody += `Contato: ${formData.studentPhone}\n\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `DADOS DO PARTICIPANTE\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `Nome: ${formData.participantName}\n`;
+                    emailBody += `Idade: ${formData.participantAge}\n`;
+                    emailBody += `Sexo: ${formData.participantSex}\n\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `RESULTADOS DA ESCALA\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `CER Positivo (Itens 1-7): ${positiveScore}\n`;
+                    emailBody += `CER Negativo (Itens 8-14): ${negativeScore}\n\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `PERFIL ESPIRITUAL (Interpretação)\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `Coping Positivo: ${positiveInterpretation}\n`;
+                    emailBody += `Coping Negativo: ${negativeInterpretation}\n\n`;
+                    emailBody += `------------------------------------\n`;
+                    emailBody += `RESPOSTAS DETALHADAS\n`;
+                    emailBody += `------------------------------------\n`;
                     project.questions.forEach((q, index) => {
-                        message += `${index + 1}. ${q.adaptada}\n`;
-                        message += `   - Resposta: *${formData.responses[index]}*\n`;
+                        emailBody += `${index + 1}. ${q.adaptada}\n`;
+                        emailBody += `   - Resposta: ${formData.responses[index]}\n\n`;
                     });
 
-                    statusMessage.textContent = 'Abrindo WhatsApp...';
-                    statusMessage.className = 'mb-4 font-semibold text-green-600';
-
-                    const professorWhatsapp = project.whatsapp;
-                    const whatsappUrl = `https://wa.me/${professorWhatsapp}?text=${encodeURIComponent(message)}`;
+                    previewMessageContainer.innerText = emailBody;
                     
-                    window.open(whatsappUrl, '_blank');
+                    const recipient = "probex2025.espiritualidade@gmail.com";
+                    const subject = `Relatório do Projeto: ${project.name}`;
+                    appState.mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
                     
-                    dataForm.reset();
-                    // Não reseta o formulário do aluno, pois os dados estão salvos
-                    navigateTo('projectSelection');
+                    navigateTo('preview');
 
                 } catch (err) {
-                    console.error("WhatsApp Error:", err);
+                    console.error("Preview Error:", err);
                     statusMessage.textContent = 'Houve um erro ao preparar a mensagem. Tente novamente.';
                     statusMessage.className = 'mb-4 font-semibold text-red-600';
-                } finally {
-                    submitButton.disabled = false;
-                    setTimeout(() => { statusMessage.textContent = ''; }, 10000);
                 }
             };
 
@@ -311,7 +345,6 @@
                 appState.studentId = document.getElementById('student-id').value;
                 appState.studentPhone = document.getElementById('student-phone').value;
                 
-                // Salva os dados no localStorage
                 localStorage.setItem('studentName', appState.studentName);
                 localStorage.setItem('studentId', appState.studentId);
                 localStorage.setItem('studentPhone', appState.studentPhone);
@@ -320,7 +353,6 @@
             });
 
             backToStudentInfoBtn.addEventListener('click', () => {
-                // Limpa os dados salvos para permitir a alteração
                 localStorage.removeItem('studentName');
                 localStorage.removeItem('studentId');
                 localStorage.removeItem('studentPhone');
@@ -328,6 +360,19 @@
             });
             
             backToProjectSelectionBtn.addEventListener('click', () => navigateTo('projectSelection'));
+            
+            backToFormBtn.addEventListener('click', () => navigateTo('dataCollection'));
+
+            sendByEmailBtn.addEventListener('click', () => {
+                if (appState.mailtoUrl) {
+                    // Primeiro, limpa o formulário do participante para a próxima coleta
+                    dataForm.reset();
+                    // Depois, navega para a tela de seleção de projetos, deixando o app pronto
+                    navigateTo('projectSelection');
+                    // Por último, aciona o cliente de e-mail
+                    window.location.href = appState.mailtoUrl;
+                }
+            });
 
             dataForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -346,12 +391,13 @@
                     } else {
                         statusMessage.textContent = `Por favor, responda a pergunta ${i + 1}.`;
                         statusMessage.className = 'mb-4 font-semibold text-red-600';
+                        setTimeout(() => { statusMessage.textContent = ''; }, 3000);
                         return;
                     }
                 }
                 
                 const fullData = { ...appState, ...participantData };
-                formatAndShareMessage(fullData);
+                generatePreview(fullData);
             });
 
             // --- Inicialização ---
@@ -364,7 +410,7 @@
                     appState.studentName = savedName;
                     appState.studentId = savedId;
                     appState.studentPhone = savedPhone;
-                    // Preenche o formulário caso o usuário volte
+                    
                     document.getElementById('student-name').value = savedName;
                     document.getElementById('student-id').value = savedId;
                     document.getElementById('student-phone').value = savedPhone;
