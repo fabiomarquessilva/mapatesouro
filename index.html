@@ -21,7 +21,7 @@
         .hidden {
             display: none;
         }
-        .email-preview, .manual-content {
+        .email-preview, .training-content {
             white-space: pre-wrap; /* Mantém as quebras de linha e espaços */
             word-wrap: break-word; /* Quebra palavras longas */
             background-color: #f9f9f9;
@@ -32,27 +32,13 @@
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             line-height: 1.6;
         }
-        .manual-content h2 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 0.5rem;
-        }
-        .manual-content h3 {
+        .training-content h3 {
             font-size: 1.25rem;
             font-weight: bold;
             margin-top: 1.5rem;
             margin-bottom: 0.5rem;
         }
-         .manual-content h4 {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        .manual-content ul {
+        .training-content ul {
             list-style-type: disc;
             margin-left: 2rem;
             margin-bottom: 1rem;
@@ -77,81 +63,36 @@
             <!-- Tela 0: Boas-vindas -->
             <div id="welcome-screen">
                 <h2 class="text-2xl font-semibold text-center text-gray-700 mb-6">Bem-vindo, Extensionista!</h2>
-                <p class="text-center text-gray-600 mb-8">Escolha uma opção para começar.</p>
+                <p class="text-center text-gray-600 mb-8">Para garantir a qualidade da coleta, o treinamento é obrigatório antes do primeiro uso.</p>
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
-                    <button id="show-manual-btn" class="w-full sm:w-1/2 py-3 px-6 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-600">Ler o Manual de Aplicação</button>
-                    <button id="start-collection-btn" class="w-full sm:w-1/2 py-3 px-6 text-white font-semibold bg-blue-600 rounded-md hover:bg-blue-700">Iniciar Coleta de Dados</button>
+                    <button id="show-training-btn" class="w-full sm:w-1/2 py-3 px-6 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-600">Iniciar/Refazer Treinamento</button>
+                    <button id="start-collection-btn" class="w-full sm:w-1/2 py-3 px-6 text-white font-semibold bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>Iniciar Coleta de Dados</button>
                 </div>
+                <p id="training-status" class="text-center mt-4 text-sm"></p>
             </div>
             
-            <!-- Tela do Manual -->
-            <div id="manual-screen" class="hidden">
-                 <div class="manual-content">
-                    <h2>Manual de Aplicação: Escala CER-Breve-14 e Ferramenta Digital</h2>
-                    <h3>Para o Extensionista do Programa "Espiritualidade e Saúde Mental"</h3>
-                    
-                    <h3>1. Introdução</h3>
-                    <p>Olá, extensionista!</p>
-                    <p>Este manual é o seu guia para a aplicação da Escala de Coping Religioso-Espiritual (CER-Breve-14) junto aos públicos dos nossos projetos. Seu trabalho é a ponte entre a universidade e a comunidade, e a qualidade dos dados que coletamos depende da sua sensibilidade e dedicação.</p>
-                    <p>O objetivo desta ferramenta é duplo:</p>
-                    <ul>
-                        <li>Padronizar a coleta de dados de forma organizada.</li>
-                        <li>Facilitar o envio dos relatórios para a coordenação do projeto.</li>
-                    </ul>
-                    <p>Lembre-se: estamos lidando com temas profundos e pessoais. Sua postura deve ser sempre de acolhimento, respeito e total confidencialidade.</p>
+            <!-- Tela do Treinamento -->
+            <div id="training-screen" class="hidden">
+                 <div id="training-step-content" class="training-content">
+                    <!-- Conteúdo do passo do treinamento será inserido aqui -->
+                 </div>
+                 <div id="training-question-container" class="mt-6">
+                    <!-- Pergunta e opções serão inseridas aqui -->
+                 </div>
+                 <div id="training-feedback" class="mt-4 font-semibold"></div>
+                 <div class="flex justify-between items-center mt-8">
+                    <button id="back-to-welcome-btn" class="text-sm text-gray-600 hover:text-gray-800">&larr; Voltar para a Tela Inicial</button>
+                    <button id="next-step-btn" class="py-2 px-6 text-white font-semibold bg-blue-600 rounded-md hover:bg-blue-700">Próximo</button>
+                 </div>
+            </div>
 
-                    <h3>2. Antes de Começar: A Importância da Abordagem Empática</h3>
-                    <p>Antes de abrir o aplicativo, sua prioridade é estabelecer uma conexão de confiança com o participante.</p>
-                    <ul>
-                        <li><strong>Crie um Ambiente Seguro:</strong> Encontre um local tranquilo e privado onde o participante se sinta à vontade para conversar.</li>
-                        <li><strong>Apresente-se e o Projeto:</strong> Explique de forma simples quem você é e qual o objetivo da pesquisa: "Estamos tentando entender como a fé e a espiritualidade ajudam as pessoas a lidar com os desafios do dia a dia".</li>
-                        <li><strong>Peça Permissão (Consentimento):</strong> Deixe claro que a participação é voluntária e que a pessoa pode parar a qualquer momento. Pergunte: "O(a) senhor(a) gostaria de participar? Leva cerca de 10 minutos".</li>
-                        <li><strong>Garanta a Confidencialidade:</strong> Assegure ao participante que suas respostas são confidenciais e que seu nome será usado apenas para a organização interna da pesquisa.</li>
-                        <li><strong>Use as Perguntas Adaptadas:</strong> O aplicativo já contém as perguntas em uma linguagem adaptada para cada público. Use-as! Elas foram criadas para serem mais claras e empáticas.</li>
-                        <li><strong>Não Julgue as Respostas:</strong> Mantenha uma postura neutra. Não existe resposta "certa" ou "errada". O objetivo é entender o que a pessoa <em>sente</em>.</li>
-                    </ul>
-
-                    <h3>3. Guia Prático: Usando o Aplicativo Gerador de Relatório</h3>
-                    <p>O aplicativo é um único arquivo HTML. Ele não precisa de instalação e funciona em qualquer navegador de celular, tablet ou computador.</p>
-                    <h4>Passo 1: Identificação do Extensionista (Apenas no primeiro uso)</h4>
-                    <p>Ao abrir o aplicativo pela primeira vez, você verá uma tela para inserir seus dados:</p>
-                    <ul>
-                        <li>Nome Completo</li>
-                        <li>Matrícula</li>
-                        <li>Telefone</li>
-                    </ul>
-                    <p><strong>Importante:</strong> Esses dados são salvos no navegador para que você não precise digitá-los toda vez. Nos próximos acessos, você irá pular diretamente para a tela de seleção de projeto.</p>
-                    
-                    <h4>Passo 2: Seleção do Projeto</h4>
-                    <p>Nesta tela, você verá 3 botões coloridos:</p>
-                    <ul>
-                        <li><strong>Verde:</strong> Projeto com Idosos (Abrigo Lucas Zorn)</li>
-                        <li><strong>Rosa:</strong> Projeto com Cuidadores de Crianças (APAE)</li>
-                        <li><strong>Laranja:</strong> Projeto com Dependentes Químicos (CAPS AD)</li>
-                    </ul>
-                    <p>Clique no botão correspondente ao público que você está entrevistando. Sua escolha define para qual coordenador o relatório será endereçado e qual a versão adaptada das perguntas será usada.</p>
-                    <p><em>Precisa corrigir seus dados?</em> Nesta tela, há um botão "Alterar dados do Extensionista" para voltar à tela inicial e corrigir suas informações.</p>
-                    
-                    <h4>Passo 3: Coleta de Dados</h4>
-                    <p>Esta é a tela principal do formulário.</p>
-                    <ol style="list-style-type: decimal; margin-left: 2rem;">
-                        <li><strong>Preencha as Informações do Participante:</strong> Nome, idade e sexo da pessoa que está sendo entrevistada.</li>
-                        <li><strong>Aplique a Escala:</strong> Leia em voz alta, de forma clara e pausada, cada uma das 14 perguntas que aparecem. Conforme o participante responde, marque a opção correspondente: "Nunca", "Raramente", "Às vezes", "Muitas vezes" ou "Sempre".</li>
-                    </ol>
-                    
-                    <h4>Passo 4: Pré-visualização e Envio do Relatório</h4>
-                    <ol style="list-style-type: decimal; margin-left: 2rem;">
-                        <li>Após preencher todas as 14 perguntas, clique no botão azul <strong>"Pré-visualizar Mensagem"</strong>.</li>
-                        <li>Você será levado a uma nova tela que mostra o <strong>relatório completo</strong> como ele será enviado, incluindo o cabeçalho, os dados que você coletou, os resultados calculados da escala e a interpretação.</li>
-                        <li><strong>Revise com atenção!</strong> Verifique se todas as informações estão corretas.</li>
-                        <li>Se estiver tudo certo, clique no botão verde <strong>"Abrir Programa de E-mail"</strong>.</li>
-                        <li>O aplicativo de e-mail do seu celular ou computador será aberto com uma nova mensagem. O destinatário, o assunto e todo o relatório já estarão preenchidos.</li>
-                        <li>Sua única tarefa é <strong>clicar no botão "Enviar"</strong> do seu programa de e-mail.</li>
-                    </ol>
-                    <p>Pronto! Após o envio, o aplicativo retornará para a tela de seleção de projeto, pronto para uma nova coleta.</p>
-                </div>
-                <div class="text-center mt-8">
-                    <button id="back-to-welcome-btn" class="w-full md:w-1/2 py-2 px-4 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-600">&larr; Voltar para a Tela Inicial</button>
+            <!-- Tela de Resultado do Treinamento -->
+            <div id="training-result-screen" class="hidden text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Resultado do Treinamento</h2>
+                <p class="text-lg mb-2">Sua pontuação foi de <span id="training-score" class="font-bold"></span>.</p>
+                <p id="training-result-message" class="text-lg font-semibold mb-6"></p>
+                <div id="training-result-actions">
+                    <!-- Botões de ação (tentar novamente ou continuar) serão inseridos aqui -->
                 </div>
             </div>
 
@@ -271,6 +212,44 @@
             const responseOptions = ["Nunca", "Raramente", "Às vezes", "Muitas vezes", "Sempre"];
             const responseMap = { "Nunca": 1, "Raramente": 2, "Às vezes": 3, "Muitas vezes": 4, "Sempre": 5 };
 
+            const trainingData = [
+                {
+                    title: "Passo 1 de 5: Introdução e Ética",
+                    content: "Seu trabalho é a ponte entre a universidade e a comunidade. Estamos lidando com temas profundos e pessoais. Sua postura deve ser sempre de acolhimento, respeito e total confidencialidade.",
+                    question: "Qual é a postura correta do extensionista?",
+                    options: ["Julgar as respostas para ajudar", "Apressar o participante para otimizar o tempo", "Acolhimento, respeito e confidencialidade"],
+                    correctAnswer: "Acolhimento, respeito e confidencialidade"
+                },
+                {
+                    title: "Passo 2 de 5: A Abordagem Correta",
+                    content: "Antes de iniciar as perguntas, é fundamental estabelecer uma conexão de confiança. Apresente-se, explique o objetivo do projeto de forma simples, peça permissão para continuar (consentimento) e garanta a confidencialidade das respostas.",
+                    question: "O que você deve fazer antes de iniciar as perguntas da escala?",
+                    options: ["Começar imediatamente para não perder tempo", "Apresentar-se, explicar o projeto e pedir consentimento", "Apenas dizer seu nome e iniciar a escala"],
+                    correctAnswer: "Apresentar-se, explicar o projeto e pedir consentimento"
+                },
+                {
+                    title: "Passo 3 de 5: Uso do Aplicativo (Parte 1)",
+                    content: "Na primeira vez que usar o aplicativo, você precisará inserir seus dados (nome, matrícula, telefone). O aplicativo salvará essas informações no navegador para que, nos próximos acessos, você pule diretamente para a tela de seleção de projeto.",
+                    question: "O que acontece após você preencher seus dados de extensionista pela primeira vez?",
+                    options: ["Você precisa preencher tudo de novo a cada uso", "Os dados são salvos no navegador para agilizar acessos futuros", "O aplicativo envia uma confirmação por e-mail"],
+                    correctAnswer: "Os dados são salvos no navegador para agilizar acessos futuros"
+                },
+                {
+                    title: "Passo 4 de 5: Uso do Aplicativo (Parte 2)",
+                    content: "O fluxo de coleta de dados é: 1) Preencher os dados do participante. 2) Aplicar as 14 perguntas. 3) Clicar em 'Pré-visualizar Mensagem' para revisar todo o relatório antes de enviá-lo.",
+                    question: "Qual é a etapa que vem *imediatamente após* preencher as 14 perguntas da escala?",
+                    options: ["Abrir o programa de e-mail", "Pré-visualizar a mensagem gerada", "Selecionar o projeto novamente"],
+                    correctAnswer: "Pré-visualizar a mensagem gerada"
+                },
+                {
+                    title: "Passo 5 de 5: Finalizando o Envio",
+                    content: "Após revisar a mensagem na tela de pré-visualização, você clicará em 'Abrir Programa de E-mail'. O aplicativo de e-mail do seu dispositivo será aberto com tudo já preenchido. Sua única tarefa é conferir uma última vez e clicar no botão 'Enviar' do seu programa de e-mail.",
+                    question: "Após clicar em 'Abrir Programa de E-mail', qual é a sua única tarefa?",
+                    options: ["Clicar em 'Enviar' no seu próprio programa de e-mail", "Escrever o e-mail do zero com suas palavras", "Anexar um arquivo PDF que foi gerado"],
+                    correctAnswer: "Clicar em 'Enviar' no seu próprio programa de e-mail"
+                }
+            ];
+
             // --- Estado da Aplicação ---
             let appState = {
                 studentName: '',
@@ -278,12 +257,15 @@
                 studentPhone: '',
                 projectKey: '',
                 mailtoUrl: '',
+                trainingStep: 0,
+                trainingScore: 0,
             };
 
             // --- Elementos da DOM ---
             const screens = {
                 welcome: document.getElementById('welcome-screen'),
-                manual: document.getElementById('manual-screen'),
+                training: document.getElementById('training-screen'),
+                trainingResult: document.getElementById('training-result-screen'),
                 studentInfo: document.getElementById('student-info-screen'),
                 projectSelection: document.getElementById('project-selection-screen'),
                 dataCollection: document.getElementById('data-collection-screen'),
@@ -300,9 +282,18 @@
             const previewMessageContainer = document.getElementById('preview-message');
             const sendByEmailBtn = document.getElementById('send-by-email-btn');
             const backToFormBtn = document.getElementById('back-to-form-btn');
-            const showManualBtn = document.getElementById('show-manual-btn');
+            const showTrainingBtn = document.getElementById('show-training-btn');
             const startCollectionBtn = document.getElementById('start-collection-btn');
             const backToWelcomeBtn = document.getElementById('back-to-welcome-btn');
+            const trainingStepContent = document.getElementById('training-step-content');
+            const trainingQuestionContainer = document.getElementById('training-question-container');
+            const trainingFeedback = document.getElementById('training-feedback');
+            const nextStepBtn = document.getElementById('next-step-btn');
+            const trainingResultScreen = document.getElementById('training-result-screen');
+            const trainingScoreEl = document.getElementById('training-score');
+            const trainingResultMessageEl = document.getElementById('training-result-message');
+            const trainingResultActionsEl = document.getElementById('training-result-actions');
+            const trainingStatusEl = document.getElementById('training-status');
 
 
             // --- Funções de Navegação ---
@@ -313,7 +304,91 @@
                 }
             };
 
-            // --- Renderização e Lógica da UI ---
+            // --- Lógica do Treinamento ---
+            const startTraining = () => {
+                appState.trainingStep = 0;
+                appState.trainingScore = 0;
+                renderTrainingStep(appState.trainingStep);
+                navigateTo('training');
+            };
+
+            const renderTrainingStep = (stepIndex) => {
+                const step = trainingData[stepIndex];
+                trainingStepContent.innerHTML = `<h3>${step.title}</h3><p>${step.content}</p>`;
+                
+                let questionHTML = `<h4 class="font-bold mt-4">${step.question}</h4><div class="space-y-2 mt-2">`;
+                step.options.forEach((option, index) => {
+                    questionHTML += `
+                        <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                            <input type="radio" name="training-q" value="${option}" required class="form-radio h-5 w-5">
+                            <span>${option}</span>
+                        </label>
+                    `;
+                });
+                questionHTML += `</div>`;
+                trainingQuestionContainer.innerHTML = questionHTML;
+                trainingFeedback.textContent = '';
+                nextStepBtn.disabled = false;
+            };
+
+            const handleNextStep = () => {
+                const selectedOption = document.querySelector('input[name="training-q"]:checked');
+                if (!selectedOption) {
+                    trainingFeedback.textContent = 'Por favor, selecione uma resposta.';
+                    trainingFeedback.className = 'mt-4 font-semibold text-red-600';
+                    return;
+                }
+
+                nextStepBtn.disabled = true;
+                const currentStep = trainingData[appState.trainingStep];
+                if (selectedOption.value === currentStep.correctAnswer) {
+                    appState.trainingScore++;
+                    trainingFeedback.textContent = 'Correto!';
+                    trainingFeedback.className = 'mt-4 font-semibold text-green-600';
+                } else {
+                    trainingFeedback.textContent = `Incorreto. A resposta certa é: "${currentStep.correctAnswer}"`;
+                    trainingFeedback.className = 'mt-4 font-semibold text-red-600';
+                }
+
+                setTimeout(() => {
+                    appState.trainingStep++;
+                    if (appState.trainingStep < trainingData.length) {
+                        renderTrainingStep(appState.trainingStep);
+                    } else {
+                        showTrainingResult();
+                    }
+                }, 1500);
+            };
+            
+            const showTrainingResult = () => {
+                const totalQuestions = trainingData.length;
+                const score = (appState.trainingScore / totalQuestions) * 100;
+                trainingScoreEl.textContent = `${score.toFixed(0)}%`;
+
+                trainingResultActionsEl.innerHTML = '';
+                if (score >= 90) {
+                    trainingResultMessageEl.textContent = "Parabéns, você foi aprovado e está apto para iniciar a coleta de dados!";
+                    trainingResultMessageEl.className = "text-lg font-semibold mb-6 text-green-600";
+                    localStorage.setItem('trainingCompleted', 'true');
+                    checkTrainingStatus(); // Atualiza o botão na tela inicial
+                    const continueBtn = document.createElement('button');
+                    continueBtn.textContent = 'Ir para a Coleta';
+                    continueBtn.className = 'py-2 px-6 text-white font-semibold bg-blue-600 rounded-md hover:bg-blue-700';
+                    continueBtn.onclick = () => checkStudentData();
+                    trainingResultActionsEl.appendChild(continueBtn);
+                } else {
+                    trainingResultMessageEl.textContent = "Você não atingiu a pontuação mínima de 90%. Por favor, estude o manual e tente novamente.";
+                    trainingResultMessageEl.className = "text-lg font-semibold mb-6 text-red-600";
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'Tentar Novamente';
+                    retryBtn.className = 'py-2 px-6 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-600';
+                    retryBtn.onclick = startTraining;
+                    trainingResultActionsEl.appendChild(retryBtn);
+                }
+                navigateTo('trainingResult');
+            };
+
+            // --- Renderização e Lógica da UI (Coleta) ---
             
             Object.keys(projectConfig).forEach(key => {
                 const project = projectConfig[key];
@@ -437,12 +512,8 @@
                 }
             };
 
-            // --- Event Listeners ---
-            showManualBtn.addEventListener('click', () => navigateTo('manual'));
-            backToWelcomeBtn.addEventListener('click', () => navigateTo('welcome'));
-
-            startCollectionBtn.addEventListener('click', () => {
-                 const savedName = localStorage.getItem('studentName');
+            const checkStudentData = () => {
+                const savedName = localStorage.getItem('studentName');
                 const savedId = localStorage.getItem('studentId');
                 const savedPhone = localStorage.getItem('studentPhone');
 
@@ -458,7 +529,14 @@
                 } else {
                     navigateTo('studentInfo');
                 }
-            });
+            };
+
+            // --- Event Listeners ---
+            showTrainingBtn.addEventListener('click', startTraining);
+            backToWelcomeBtn.addEventListener('click', () => navigateTo('welcome'));
+            nextStepBtn.addEventListener('click', handleNextStep);
+
+            startCollectionBtn.addEventListener('click', checkStudentData);
 
             studentForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -519,9 +597,24 @@
             });
 
             // --- Inicialização ---
+            const checkTrainingStatus = () => {
+                const isCompleted = localStorage.getItem('trainingCompleted') === 'true';
+                if (isCompleted) {
+                    startCollectionBtn.disabled = false;
+                    startCollectionBtn.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+                    trainingStatusEl.textContent = 'Treinamento concluído! Você já pode iniciar a coleta.';
+                    trainingStatusEl.className = 'text-center mt-4 text-sm text-green-600';
+                } else {
+                    startCollectionBtn.disabled = true;
+                     trainingStatusEl.textContent = 'É necessário completar o treinamento para liberar a coleta.';
+                     trainingStatusEl.className = 'text-center mt-4 text-sm text-red-600';
+                }
+            };
+
             const initApp = () => {
                  document.getElementById('loading-screen').classList.add('hidden');
                  document.getElementById('app-container').classList.remove('hidden');
+                 checkTrainingStatus();
                  navigateTo('welcome');
             };
 
