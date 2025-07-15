@@ -21,16 +21,41 @@
         .hidden {
             display: none;
         }
-        .email-preview {
+        .email-preview, .manual-content {
             white-space: pre-wrap; /* Mantém as quebras de linha e espaços */
             word-wrap: break-word; /* Quebra palavras longas */
             background-color: #f9f9f9;
             border: 1px solid #e0e0e0;
             border-radius: 0.5rem;
-            padding: 1rem;
+            padding: 1.5rem;
             color: #333;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             line-height: 1.6;
+        }
+        .manual-content h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 0.5rem;
+        }
+        .manual-content h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+         .manual-content h4 {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .manual-content ul {
+            list-style-type: disc;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -49,8 +74,89 @@
                 <p class="text-center text-gray-600 mt-2">Escala de Coping Religioso-Espiritual (CER-Breve-14)</p>
             </div>
 
+            <!-- Tela 0: Boas-vindas -->
+            <div id="welcome-screen">
+                <h2 class="text-2xl font-semibold text-center text-gray-700 mb-6">Bem-vindo, Extensionista!</h2>
+                <p class="text-center text-gray-600 mb-8">Escolha uma opção para começar.</p>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+                    <button id="show-manual-btn" class="w-full sm:w-1/2 py-3 px-6 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-600">Ler o Manual de Aplicação</button>
+                    <button id="start-collection-btn" class="w-full sm:w-1/2 py-3 px-6 text-white font-semibold bg-blue-600 rounded-md hover:bg-blue-700">Iniciar Coleta de Dados</button>
+                </div>
+            </div>
+            
+            <!-- Tela do Manual -->
+            <div id="manual-screen" class="hidden">
+                 <div class="manual-content">
+                    <h2>Manual de Aplicação: Escala CER-Breve-14 e Ferramenta Digital</h2>
+                    <h3>Para o Extensionista do Programa "Espiritualidade e Saúde Mental"</h3>
+                    
+                    <h3>1. Introdução</h3>
+                    <p>Olá, extensionista!</p>
+                    <p>Este manual é o seu guia para a aplicação da Escala de Coping Religioso-Espiritual (CER-Breve-14) junto aos públicos dos nossos projetos. Seu trabalho é a ponte entre a universidade e a comunidade, e a qualidade dos dados que coletamos depende da sua sensibilidade e dedicação.</p>
+                    <p>O objetivo desta ferramenta é duplo:</p>
+                    <ul>
+                        <li>Padronizar a coleta de dados de forma organizada.</li>
+                        <li>Facilitar o envio dos relatórios para a coordenação do projeto.</li>
+                    </ul>
+                    <p>Lembre-se: estamos lidando com temas profundos e pessoais. Sua postura deve ser sempre de acolhimento, respeito e total confidencialidade.</p>
+
+                    <h3>2. Antes de Começar: A Importância da Abordagem Empática</h3>
+                    <p>Antes de abrir o aplicativo, sua prioridade é estabelecer uma conexão de confiança com o participante.</p>
+                    <ul>
+                        <li><strong>Crie um Ambiente Seguro:</strong> Encontre um local tranquilo e privado onde o participante se sinta à vontade para conversar.</li>
+                        <li><strong>Apresente-se e o Projeto:</strong> Explique de forma simples quem você é e qual o objetivo da pesquisa: "Estamos tentando entender como a fé e a espiritualidade ajudam as pessoas a lidar com os desafios do dia a dia".</li>
+                        <li><strong>Peça Permissão (Consentimento):</strong> Deixe claro que a participação é voluntária e que a pessoa pode parar a qualquer momento. Pergunte: "O(a) senhor(a) gostaria de participar? Leva cerca de 10 minutos".</li>
+                        <li><strong>Garanta a Confidencialidade:</strong> Assegure ao participante que suas respostas são confidenciais e que seu nome será usado apenas para a organização interna da pesquisa.</li>
+                        <li><strong>Use as Perguntas Adaptadas:</strong> O aplicativo já contém as perguntas em uma linguagem adaptada para cada público. Use-as! Elas foram criadas para serem mais claras e empáticas.</li>
+                        <li><strong>Não Julgue as Respostas:</strong> Mantenha uma postura neutra. Não existe resposta "certa" ou "errada". O objetivo é entender o que a pessoa <em>sente</em>.</li>
+                    </ul>
+
+                    <h3>3. Guia Prático: Usando o Aplicativo Gerador de Relatório</h3>
+                    <p>O aplicativo é um único arquivo HTML. Ele não precisa de instalação e funciona em qualquer navegador de celular, tablet ou computador.</p>
+                    <h4>Passo 1: Identificação do Extensionista (Apenas no primeiro uso)</h4>
+                    <p>Ao abrir o aplicativo pela primeira vez, você verá uma tela para inserir seus dados:</p>
+                    <ul>
+                        <li>Nome Completo</li>
+                        <li>Matrícula</li>
+                        <li>Telefone</li>
+                    </ul>
+                    <p><strong>Importante:</strong> Esses dados são salvos no navegador para que você não precise digitá-los toda vez. Nos próximos acessos, você irá pular diretamente para a tela de seleção de projeto.</p>
+                    
+                    <h4>Passo 2: Seleção do Projeto</h4>
+                    <p>Nesta tela, você verá 3 botões coloridos:</p>
+                    <ul>
+                        <li><strong>Verde:</strong> Projeto com Idosos (Abrigo Lucas Zorn)</li>
+                        <li><strong>Rosa:</strong> Projeto com Cuidadores de Crianças (APAE)</li>
+                        <li><strong>Laranja:</strong> Projeto com Dependentes Químicos (CAPS AD)</li>
+                    </ul>
+                    <p>Clique no botão correspondente ao público que você está entrevistando. Sua escolha define para qual coordenador o relatório será endereçado e qual a versão adaptada das perguntas será usada.</p>
+                    <p><em>Precisa corrigir seus dados?</em> Nesta tela, há um botão "Alterar dados do Extensionista" para voltar à tela inicial e corrigir suas informações.</p>
+                    
+                    <h4>Passo 3: Coleta de Dados</h4>
+                    <p>Esta é a tela principal do formulário.</p>
+                    <ol style="list-style-type: decimal; margin-left: 2rem;">
+                        <li><strong>Preencha as Informações do Participante:</strong> Nome, idade e sexo da pessoa que está sendo entrevistada.</li>
+                        <li><strong>Aplique a Escala:</strong> Leia em voz alta, de forma clara e pausada, cada uma das 14 perguntas que aparecem. Conforme o participante responde, marque a opção correspondente: "Nunca", "Raramente", "Às vezes", "Muitas vezes" ou "Sempre".</li>
+                    </ol>
+                    
+                    <h4>Passo 4: Pré-visualização e Envio do Relatório</h4>
+                    <ol style="list-style-type: decimal; margin-left: 2rem;">
+                        <li>Após preencher todas as 14 perguntas, clique no botão azul <strong>"Pré-visualizar Mensagem"</strong>.</li>
+                        <li>Você será levado a uma nova tela que mostra o <strong>relatório completo</strong> como ele será enviado, incluindo o cabeçalho, os dados que você coletou, os resultados calculados da escala e a interpretação.</li>
+                        <li><strong>Revise com atenção!</strong> Verifique se todas as informações estão corretas.</li>
+                        <li>Se estiver tudo certo, clique no botão verde <strong>"Abrir Programa de E-mail"</strong>.</li>
+                        <li>O aplicativo de e-mail do seu celular ou computador será aberto com uma nova mensagem. O destinatário, o assunto e todo o relatório já estarão preenchidos.</li>
+                        <li>Sua única tarefa é <strong>clicar no botão "Enviar"</strong> do seu programa de e-mail.</li>
+                    </ol>
+                    <p>Pronto! Após o envio, o aplicativo retornará para a tela de seleção de projeto, pronto para uma nova coleta.</p>
+                </div>
+                <div class="text-center mt-8">
+                    <button id="back-to-welcome-btn" class="w-full md:w-1/2 py-2 px-4 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-600">&larr; Voltar para a Tela Inicial</button>
+                </div>
+            </div>
+
             <!-- Tela 1: Informações do Aluno -->
-            <div id="student-info-screen">
+            <div id="student-info-screen" class="hidden">
                 <form id="student-form" class="space-y-6">
                     <h3 class="text-xl font-semibold mb-4 pb-2 border-b-2 border-gray-400 text-gray-700">1. Identificação do Extensionista</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -176,6 +282,8 @@
 
             // --- Elementos da DOM ---
             const screens = {
+                welcome: document.getElementById('welcome-screen'),
+                manual: document.getElementById('manual-screen'),
                 studentInfo: document.getElementById('student-info-screen'),
                 projectSelection: document.getElementById('project-selection-screen'),
                 dataCollection: document.getElementById('data-collection-screen'),
@@ -192,6 +300,9 @@
             const previewMessageContainer = document.getElementById('preview-message');
             const sendByEmailBtn = document.getElementById('send-by-email-btn');
             const backToFormBtn = document.getElementById('back-to-form-btn');
+            const showManualBtn = document.getElementById('show-manual-btn');
+            const startCollectionBtn = document.getElementById('start-collection-btn');
+            const backToWelcomeBtn = document.getElementById('back-to-welcome-btn');
 
 
             // --- Funções de Navegação ---
@@ -283,44 +394,32 @@
                     const positiveInterpretation = getInterpretation(positiveScore, 'positive');
                     const negativeInterpretation = getInterpretation(negativeScore, 'negative');
 
-                    // Gerar o corpo do e-mail (texto plano com quebras de linha)
                     let emailBody = `UNIVERSIDADE FEDERAL DE CAMPINA GRANDE\n`;
                     emailBody += `CENTRO DE FORMAÇÃO DE PROFESSORES\n`;
                     emailBody += `UNIDADE ACADÊMICA DE ENFERMAGEM\n`;
-                    emailBody += `PROGRAMA DE EXTENSÃO ESPIRITUALIDADE E SAÚDE MENTAL\n\n`;
+                    emailBody += `*PROGRAMA DE EXTENSÃO ESPIRITUALIDADE E SAÚDE MENTAL*\n\n`;
                     emailBody += `------------------------------------\n\n`;
-
-                    emailBody += `RELATÓRIO DE AVALIAÇÃO - CER-BREVE-14\n\n`;
-                    emailBody += `Projeto: ${project.name}\n`;
-                    emailBody += `Data: ${new Date().toLocaleString('pt-BR')}\n\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `DADOS DO EXTENSIONISTA\n`;
-                    emailBody += `------------------------------------\n`;
+                    emailBody += `*RELATÓRIO DE AVALIAÇÃO - CER-BREVE-14*\n\n`;
+                    emailBody += `*Projeto:* ${project.name}\n`;
+                    emailBody += `*Data:* ${new Date().toLocaleString('pt-BR')}\n\n`;
+                    emailBody += `*Dados do Extensionista:*\n`;
                     emailBody += `Nome: ${formData.studentName}\n`;
                     emailBody += `Matrícula: ${formData.studentId}\n`;
                     emailBody += `Contato: ${formData.studentPhone}\n\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `DADOS DO PARTICIPANTE\n`;
-                    emailBody += `------------------------------------\n`;
+                    emailBody += `*Dados do Participante:*\n`;
                     emailBody += `Nome: ${formData.participantName}\n`;
                     emailBody += `Idade: ${formData.participantAge}\n`;
                     emailBody += `Sexo: ${formData.participantSex}\n\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `RESULTADOS DA ESCALA\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `CER Positivo (Itens 1-7): ${positiveScore}\n`;
-                    emailBody += `CER Negativo (Itens 8-14): ${negativeScore}\n\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `PERFIL ESPIRITUAL (Interpretação)\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `Coping Positivo: ${positiveInterpretation}\n`;
-                    emailBody += `Coping Negativo: ${negativeInterpretation}\n\n`;
-                    emailBody += `------------------------------------\n`;
-                    emailBody += `RESPOSTAS DETALHADAS\n`;
-                    emailBody += `------------------------------------\n`;
+                    emailBody += `*Resultados da Escala:*\n`;
+                    emailBody += `CER Positivo (Itens 1-7): *${positiveScore}*\n`;
+                    emailBody += `CER Negativo (Itens 8-14): *${negativeScore}*\n\n`;
+                    emailBody += `*Perfil Espiritual (Interpretação):*\n`;
+                    emailBody += `Coping Positivo: *${positiveInterpretation}*\n`;
+                    emailBody += `Coping Negativo: *${negativeInterpretation}*\n\n`;
+                    emailBody += `*Respostas Detalhadas:*\n`;
                     project.questions.forEach((q, index) => {
                         emailBody += `${index + 1}. ${q.adaptada}\n`;
-                        emailBody += `   - Resposta: ${formData.responses[index]}\n\n`;
+                        emailBody += `   - Resposta: *${formData.responses[index]}*\n`;
                     });
 
                     previewMessageContainer.innerText = emailBody;
@@ -339,6 +438,28 @@
             };
 
             // --- Event Listeners ---
+            showManualBtn.addEventListener('click', () => navigateTo('manual'));
+            backToWelcomeBtn.addEventListener('click', () => navigateTo('welcome'));
+
+            startCollectionBtn.addEventListener('click', () => {
+                 const savedName = localStorage.getItem('studentName');
+                const savedId = localStorage.getItem('studentId');
+                const savedPhone = localStorage.getItem('studentPhone');
+
+                if (savedName && savedId && savedPhone) {
+                    appState.studentName = savedName;
+                    appState.studentId = savedId;
+                    appState.studentPhone = savedPhone;
+                    
+                    document.getElementById('student-name').value = savedName;
+                    document.getElementById('student-id').value = savedId;
+                    document.getElementById('student-phone').value = savedPhone;
+                    navigateTo('projectSelection');
+                } else {
+                    navigateTo('studentInfo');
+                }
+            });
+
             studentForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 appState.studentName = document.getElementById('student-name').value;
@@ -365,11 +486,8 @@
 
             sendByEmailBtn.addEventListener('click', () => {
                 if (appState.mailtoUrl) {
-                    // Primeiro, limpa o formulário do participante para a próxima coleta
                     dataForm.reset();
-                    // Depois, navega para a tela de seleção de projetos, deixando o app pronto
                     navigateTo('projectSelection');
-                    // Por último, aciona o cliente de e-mail
                     window.location.href = appState.mailtoUrl;
                 }
             });
@@ -401,28 +519,13 @@
             });
 
             // --- Inicialização ---
-            const checkSavedData = () => {
-                const savedName = localStorage.getItem('studentName');
-                const savedId = localStorage.getItem('studentId');
-                const savedPhone = localStorage.getItem('studentPhone');
-
-                if (savedName && savedId && savedPhone) {
-                    appState.studentName = savedName;
-                    appState.studentId = savedId;
-                    appState.studentPhone = savedPhone;
-                    
-                    document.getElementById('student-name').value = savedName;
-                    document.getElementById('student-id').value = savedId;
-                    document.getElementById('student-phone').value = savedPhone;
-                    navigateTo('projectSelection');
-                } else {
-                    navigateTo('studentInfo');
-                }
+            const initApp = () => {
                  document.getElementById('loading-screen').classList.add('hidden');
                  document.getElementById('app-container').classList.remove('hidden');
+                 navigateTo('welcome');
             };
 
-            checkSavedData();
+            initApp();
         });
     </script>
 </body>
